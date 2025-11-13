@@ -1,4 +1,5 @@
 const std = @import("std");
+const constants = @import("constants.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -11,14 +12,7 @@ pub fn main() !void {
 
 
     if(args.len < 2) {
-        const usage = 
-            \\
-            \\    usage: psa -m=<mode> -h=<your-hash>
-            \\    Modes: dict (dictionary attack), brute (brute-force), audit (batch audit)
-            \\    Example: psa -m=dict -h=5f4dcc3b5aa765d61d8327deb882cf99 -w=rockyou.txt
-            \\
-        ;
-        std.debug.print("{s}\n", .{usage});
+        std.debug.print("{s}\n", .{constants.usage_string});
         return;
     }
 
