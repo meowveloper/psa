@@ -31,20 +31,8 @@ pub fn main() !void {
             wordlist = arg[3..];
         }
     }
-
-    if (mode == null) {
-        try utilities.print("    Error: -m required.\n", .{});
-        return;
-    }
-
-    const valid_mode = std.mem.eql(u8, mode.?, constants.dict_mode_string) or
-        std.mem.eql(u8, mode.?, constants.brute_mode_string) or
-        std.mem.eql(u8, mode.?, constants.audit_mode_string);
-
-    if (!valid_mode) {
-        try utilities.print("    Error: invalid mode {s}. Must be {s}, {s}, or {s}.\n", .{ mode.?, constants.dict_mode_string, constants.brute_mode_string, constants.audit_mode_string });
-        return;
-    }
+    
+    if(!try utilities.check_mode(mode)) return;
 
     try utilities.print("    mode: {s}\n", .{mode.?});
     if (hash) |h| try utilities.print("    hash: {s}\n", .{h});
