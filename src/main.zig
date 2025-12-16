@@ -1,6 +1,7 @@
 const std = @import("std");
 const constants = @import("constants.zig");
 const utilities = @import("utility.zig");
+const dict = @import("dict.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -34,7 +35,8 @@ pub fn main() !void {
     
     if(!try utilities.check_mode(mode)) return;
 
-    try utilities.print("    mode: {s}\n", .{mode.?});
-    if (hash) |h| try utilities.print("    hash: {s}\n", .{h});
-    if (wordlist) |w| try utilities.print("    wordlist: {s}\n", .{w});
+    if(std.mem.eql(u8, mode.?, "dict")) {
+        try dict.dictionary_attack(hash, wordlist);
+    }
 }
+
