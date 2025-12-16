@@ -1,5 +1,6 @@
 const std = @import("std");
 const constants = @import("constants.zig");
+const utilities = @import("utility.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -11,7 +12,7 @@ pub fn main() !void {
     defer std.process.argsFree(allocator, args);
 
     if (args.len < 2) {
-        std.debug.print("{s}\n", .{constants.usage_string});
+        try utilities.print("{s}\n", .{constants.usage_string});
         return;
     }
 
@@ -32,7 +33,7 @@ pub fn main() !void {
     }
 
     if (mode == null) {
-        std.debug.print("    Error: -m required.\n", .{});
+        try utilities.print("    Error: -m required.\n", .{});
         return;
     }
 
@@ -41,11 +42,11 @@ pub fn main() !void {
         std.mem.eql(u8, mode.?, constants.audit_mode_string);
 
     if (!valid_mode) {
-        std.debug.print("    Error: invalid mode {s}. Must be {s}, {s}, or {s}.\n", .{ mode.?, constants.dict_mode_string, constants.brute_mode_string, constants.audit_mode_string });
+        try utilities.print("    Error: invalid mode {s}. Must be {s}, {s}, or {s}.\n", .{ mode.?, constants.dict_mode_string, constants.brute_mode_string, constants.audit_mode_string });
         return;
     }
 
-    std.debug.print("    mode: {s}\n", .{mode.?});
-    if (hash) |h| std.debug.print("    hash: {s}\n", .{h});
-    if (wordlist) |w| std.debug.print("    wordlist: {s}\n", .{w});
+    try utilities.print("    mode: {s}\n", .{mode.?});
+    if (hash) |h| try utilities.print("    hash: {s}\n", .{h});
+    if (wordlist) |w| try utilities.print("    wordlist: {s}\n", .{w});
 }
