@@ -25,3 +25,15 @@ pub fn check_mode(mode: ?[]const u8) !bool {
     }
     return true;
 }
+
+
+pub fn is_md5_hash_equal(allocaltor: std.mem.Allocator, str: []const u8, hash_str: []const u8) !bool {
+    var hasher = std.crypto.hash.Md5.init(.{});
+    hasher.update(str);
+    var output: [16]u8 = undefined;
+    hasher.final(&output);
+    const string = try std.fmt.allocPrint(allocaltor, "{x}", .{output});
+    defer allocaltor.free(string);
+    return std.mem.eql(u8, string, hash_str);
+}
+
