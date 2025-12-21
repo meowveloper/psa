@@ -15,11 +15,29 @@ pub fn dictionary_attack(allocator: std.mem.Allocator, hash: ?[]const u8, wordli
     var reader = file.reader(&file_buffer);
 
     var line_no: usize = 0;
+    var is_equal: bool = false;
+    var found_pw: []u8 = undefined;
     while (try reader.interface.takeDelimiter('\n')) |line| {
         line_no += 1;
-        try utilities.print("{d}--{s}\n", .{line_no, line});
-        const is_equal = try utilities.is_md5_hash_equal(allocator, line, hash.?);
-        try utilities.print("{}\n", .{is_equal});
+        try utilities.print("trying the word {s} at line {d}.\n", .{line, line_no});
+        is_equal = try utilities.is_md5_hash_equal(allocator, line, hash.?);
+        if(is_equal) {
+            found_pw = line;
+            break;
+        }
     }
+    
+    try utilities.print("\n\n", .{});
+    if(is_equal) {
+        try utilities.print("------------------------------\n", .{});
+        try utilities.print("your hashed password was FOUND in the dictionary file!!\n", .{});
+        try utilities.print("found password: {s}\n", .{found_pw});
+        try utilities.print("------------------------------\n", .{});
+    } else {
+        try utilities.print("------------------------------\n", .{});
+        try utilities.print("Congratuations!! your hashed password was NOT found in the dictionary file!!\n", .{});
+        try utilities.print("------------------------------\n", .{});
+    }
+
 }
 
