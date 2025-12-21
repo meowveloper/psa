@@ -36,7 +36,7 @@ pub fn main() !void {
     if(!try utilities.check_mode(mode)) return;
 
     if(std.mem.eql(u8, mode.?, "dict")) {
-        try dict.dictionary_attack(hash, wordlist);
+        try dict.dictionary_attack(allocator, hash, wordlist);
     }
 }
 
