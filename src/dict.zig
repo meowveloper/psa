@@ -14,12 +14,10 @@ pub fn dictionary_attack(allocator: std.mem.Allocator, hash: ?[]const u8, wordli
     var file_buffer: [4096]u8 = undefined;
     var reader = file.reader(&file_buffer);
 
-    var line_no: usize = 0;
     var is_equal: bool = false;
     var found_pw: []u8 = undefined;
     while (try reader.interface.takeDelimiter('\n')) |line| {
-        line_no += 1;
-        try utilities.print("trying the word {s} at line {d}.\n", .{line, line_no});
+        try utilities.print("trying the word {s}.\n", .{line});
         is_equal = try utilities.is_md5_hash_equal(allocator, line, hash.?);
         if(is_equal) {
             found_pw = line;
