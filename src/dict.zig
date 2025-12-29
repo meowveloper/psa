@@ -19,8 +19,10 @@ pub fn dictionary_attack(hash: ?[]const u8, wordlist: ?[]const u8) !void {
 
     var is_equal: bool = false;
     var found_pw: []u8 = undefined;
+    var line_num: usize = 0;
     while (try reader.interface.takeDelimiter('\n')) |line| {
-        try utilities.print("trying the word {s}.\n", .{line});
+        if(line_num % 1000 == 0) try utilities.print("trying the word {s}.\r", .{line});
+        line_num += 1;
         is_equal = utilities.is_md5_hash_equal(line, &target_hash_bytes);
         if(is_equal) {
             found_pw = line;
