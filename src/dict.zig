@@ -1,7 +1,7 @@
 const std = @import("std");
 const utilities = @import("utility.zig");
 
-pub fn dictionary_attack(allocator: std.mem.Allocator, hash: ?[]const u8, wordlist: ?[]const u8) !void {
+pub fn dictionary_attack(hash: ?[]const u8, wordlist: ?[]const u8) !void {
     try utilities.print("------------------------------\n", .{});
     try utilities.print("performing dictionary attack!!\n", .{});
     try utilities.print("hash: {s},\nwordlist: {s}\n", .{ hash.?, wordlist.? });
@@ -14,11 +14,14 @@ pub fn dictionary_attack(allocator: std.mem.Allocator, hash: ?[]const u8, wordli
     var file_buffer: [4096]u8 = undefined;
     var reader = file.reader(&file_buffer);
 
+    var target_hash_bytes: [16]u8 = undefined;
+    _ = try std.fmt.hexToBytes(&target_hash_bytes, hash.?);
+
     var is_equal: bool = false;
     var found_pw: []u8 = undefined;
     while (try reader.interface.takeDelimiter('\n')) |line| {
         try utilities.print("trying the word {s}.\n", .{line});
-        is_equal = try utilities.is_md5_hash_equal(allocator, line, hash.?);
+        is_equal = utilities.is_md5_hash_equal(line, &target_hash_bytes);
         if(is_equal) {
             found_pw = line;
             break;
