@@ -35,3 +35,15 @@ pub fn is_md5_hash_equal(str: []const u8, target_hash: *const [16]u8) bool {
     return std.mem.eql(u8, &output, target_hash);
 }
 
+
+pub fn attack_summery (attempts: usize, elapsed_ns: u64) !void {
+    const elapsed_s = @as(f64, @floatFromInt(elapsed_ns)) / std.time.ns_per_s;
+    const hps = if (elapsed_s > 0) @as(f64, @floatFromInt(attempts)) / elapsed_s else 0;
+    try print("\n\n", .{});
+    try print("-----ATTACK SUMMARY-----\n", .{});
+    try print("Total Attempts: {d}\n", .{attempts});
+    try print("Total Time: {d:.4} seconds\n", .{elapsed_s});
+    try print("Speed: {d:.2} hashes per second\n", .{hps});
+    try print("-----ATTACK SUMMARY-----\n", .{});
+
+}
