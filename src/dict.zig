@@ -34,8 +34,6 @@ pub fn dictionary_attack(hash: ?[]const u8, wordlist: ?[]const u8) !void {
     }
     
     const elapsed_ns = timer.read();
-    const elapsed_s = @as(f64, @floatFromInt(elapsed_ns)) / std.time.ns_per_s;
-    const hps = if (elapsed_s > 0) @as(f64, @floatFromInt(line_num)) / elapsed_s else 0;
     
     
     try utilities.print("\n\n", .{});
@@ -49,12 +47,6 @@ pub fn dictionary_attack(hash: ?[]const u8, wordlist: ?[]const u8) !void {
         try utilities.print("Congratuations!! your hashed password was NOT found in the dictionary file!!\n", .{});
         try utilities.print("------------------------------\n", .{});
     }
-
-    try utilities.print("\n\n", .{});
-    try utilities.print("-----ATTACK SUMMARY-----\n", .{});
-    try utilities.print("Total Attempts: {d}\n", .{line_num});
-    try utilities.print("Total Time: {d:.4} seconds\n", .{elapsed_s});
-    try utilities.print("Speed: {d:.2} hashes per second\n", .{hps});
-    try utilities.print("-----ATTACK SUMMARY-----\n", .{});
+    try utilities.attack_summery(line_num, elapsed_ns); 
 }
 
