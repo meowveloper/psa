@@ -1,7 +1,7 @@
 const std = @import("std");
 const utilities = @import("utility.zig");
 
-pub fn run_brute_force_attack(hash: ?[]const u8) !void {
+pub fn run_brute_force_attack(hash: ?[]const u8, max_length: usize) !void {
     try utilities.print("------------------------------\n", .{});
     try utilities.print("performing brute force attack!!\n", .{});
     try utilities.print("hash: {s},\n", .{ hash.? });
@@ -19,10 +19,8 @@ pub fn run_brute_force_attack(hash: ?[]const u8) !void {
 
 
     var timer = try std.time.Timer.start();
-    var max_length: usize = 0;
 
-    for(0..9) |i| {
-        max_length = i;
+    for(0..max_length) |i| {
         is_equal = try brute_recursive(&buffer, 0, i, &target_hash_bytes, wordlist, &attempts);
         if(is_equal) break;
     }
