@@ -44,6 +44,4 @@ pub fn attack_summery (attempts: usize, elapsed_ns: u64) !void {
     try print("Total Attempts: {d}\n", .{attempts});
     try print("Total Time: {d:.4} seconds\n", .{elapsed_s});
     try print("Speed: {d:.2} hashes per second\n", .{hps});
-    try print("-----ATTACK SUMMARY-----\n", .{});
-
 }
