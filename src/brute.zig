@@ -2,10 +2,9 @@ const std = @import("std");
 const utilities = @import("utility.zig");
 const constants = @import("constants.zig");
 
-pub fn init_brute_force_attack(hash: ?[]const u8, max_length: usize) !void {
+pub fn init_brute_force_attack(hash: ?[]const u8) !void {
     try utilities.print("------------------------------\n", .{});
     try utilities.print("performing brute force attack!!\n", .{});
-    try utilities.print("hash: {s},\n", .{ hash.? });
     try utilities.print("------------------------------\n\n\n", .{});
 
 
@@ -19,20 +18,52 @@ pub fn init_brute_force_attack(hash: ?[]const u8, max_length: usize) !void {
     var stdin_buffer: [1024]u8 = undefined;
     var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
     const stdin = &stdin_reader.interface;
-    const data = try stdin.takeDelimiterExclusive('\n');
+    const char_set_select_raw = try stdin.takeDelimiter('\n');
+    const char_set_select = std.mem.trim(u8, char_set_select_raw.?, &std.ascii.whitespace);
 
-    if(std.mem.eql(u8, data, "1")) {
-        try run_brute_force_attack(constants.lowers, hash, max_length);
-    } else if(std.mem.eql(u8, data, "2")) {
-        try run_brute_force_attack(constants.lowers_and_numbers, hash, max_length);
-    } else if(std.mem.eql(u8, data, "3")) {
-        try run_brute_force_attack(constants.lowers_numbers_and_uppers, hash, max_length);
-    } else if(std.mem.eql(u8, data, "4")) {
-        try run_brute_force_attack(constants.lowers_numbers_uppers_specChars, hash, max_length);
+    var wordlist: []const u8 = undefined;
+    if(std.mem.eql(u8, char_set_select, "1")) {
+        wordlist = constants.lowers;
+    } else if(std.mem.eql(u8, char_set_select, "2")) {
+        wordlist = constants.lowers_and_numbers;
+    } else if(std.mem.eql(u8, char_set_select, "3")) {
+        wordlist = constants.lowers_numbers_and_uppers;
+    } else if(std.mem.eql(u8, char_set_select, "4")) {
+        wordlist = constants.lowers_numbers_uppers_specChars;
     } else {
         try utilities.print("ERROR: invalid input!!!\n", .{});
+        return;
     }
 
+    try utilities.print("\n--- WARNING ---\n", .{});
+    try utilities.print("Brute force attacks have exponential complexity (O(n^L)).\n", .{});
+    try utilities.print("Length 1-5: Instant/Seconds/Minutes\n", .{});
+    try utilities.print("Length 6-7: Minutes/Hours\n", .{});
+    try utilities.print("Length 8+: Days/Years (depending on hardware and char set)\n", .{});
+    try utilities.print("---------------\n", .{});
+    try utilities.print("Enter maximum password length: ", .{});
+
+
+    var max_length: usize = 0;
+    const len_data = try stdin.takeDelimiter('\n');
+    const trimmed = std.mem.trim(u8, len_data.?, &std.ascii.whitespace);
+    max_length = std.fmt.parseInt(usize, trimmed, 10) catch {
+        try utilities.print("ERROR: invalid length input!!!\n", .{});
+        return;
+    };
+
+    try utilities.print("brute force attack will run with the followings\n", .{});
+    try utilities.print("hash: {s},\n", .{ hash.? });
+    try utilities.print("character set: {s}\n", .{wordlist});
+    try utilities.print("max password length: {d}\n", .{max_length});
+    try utilities.print("do you want to continue?\n", .{});
+    try utilities.print("y/n: ", .{});
+    
+    const y_n_raw = try stdin.takeDelimiter('\n');
+    const y_n = std.mem.trim(u8, y_n_raw.?, &std.ascii.whitespace);
+    if(std.mem.eql(u8, y_n, "y") or std.mem.eql(u8, y_n, "Y")) {
+        try run_brute_force_attack(wordlist, hash, max_length);
+    }
 }
 
 fn run_brute_force_attack(wordlist: []const u8,hash: ?[]const u8, max_length: usize) !void {

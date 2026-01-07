@@ -40,7 +40,7 @@ pub fn main() !void {
         try dict.dictionary_attack(hash, wordlist);
     }
     if(std.mem.eql(u8, mode.?, constants.brute_mode_string)) {
-        try brute.init_brute_force_attack(hash, 5);
+        try brute.init_brute_force_attack(hash);
     }
 }
 
