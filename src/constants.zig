@@ -1,9 +1,29 @@
 
 pub const usage_string = 
     \\
-    \\    usage: psa -m=<mode> -h=<your-hash>
-    \\    Modes: dict (dictionary attack), brute (brute-force), audit (batch audit)
-    \\    Example: psa -m=dict -h=5f4dcc3b5aa765d61d8327deb882cf99 -w=rockyou.txt
+    \\  Password Strength Auditor (PSA) - High Performance Security Tool
+    \\
+    \\  Usage: psa -m=<mode> [options]
+    \\
+    \\  Modes:
+    \\    dict    Dictionary attack against a single hash.
+    \\            Requires: -h=<hash>, -w=<wordlist>
+    \\
+    \\    brute   Brute-force attack against a single hash.
+    \\            Requires: -h=<hash> (interactive parameters)
+    \\
+    \\    audit   Batch audit mode for multiple hashes.
+    \\            (Interactive parameters)
+    \\
+    \\  Options:
+    \\    -m=<mode>      Select mode (dict, brute, audit)
+    \\    -h=<hash>      Target MD5 hash in hex format
+    \\    -w=<wordlist>  Path to the dictionary file
+    \\
+    \\  Examples:
+    \\    psa -m=dict -h=5f4dcc3b5aa765d61d8327deb882cf99 -w=rockyou.txt
+    \\    psa -m=brute -h=5f4dcc3b5aa765d61d8327deb882cf99
+    \\    psa -m=audit
     \\
 ;
 

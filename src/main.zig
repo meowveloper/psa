@@ -38,9 +38,19 @@ pub fn main() !void {
     if(!try utilities.check_mode(mode)) return;
 
     if(std.mem.eql(u8, mode.?, constants.dict_mode_string)) {
+        if (hash == null or wordlist == null) {
+            try utilities.print("Error: Dictionary mode requires both -h=<hash> and -w=<wordlist>\n\n", .{});
+            try utilities.print("{s}\n", .{constants.usage_string});
+            return;
+        }
         try dict.init_dictionary_attack(hash, wordlist);
     }
     if(std.mem.eql(u8, mode.?, constants.brute_mode_string)) {
+        if (hash == null) {
+            try utilities.print("Error: Brute-force mode requires -h=<hash>\n\n", .{});
+            try utilities.print("{s}\n", .{constants.usage_string});
+            return;
+        }
         try brute.init_brute_force_attack(hash);
     }
     if(std.mem.eql(u8, mode.?, constants.audit_mode_string)) {
