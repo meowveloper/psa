@@ -3,6 +3,7 @@ const constants = @import("constants.zig");
 const utilities = @import("utility.zig");
 const dict = @import("dict.zig");
 const brute = @import("brute.zig");
+const audit = @import("audit.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -41,6 +42,9 @@ pub fn main() !void {
     }
     if(std.mem.eql(u8, mode.?, constants.brute_mode_string)) {
         try brute.init_brute_force_attack(hash);
+    }
+    if(std.mem.eql(u8, mode.?, constants.audit_mode_string)) {
+        try audit.init_audit_mode();
     }
 }
 
