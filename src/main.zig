@@ -44,7 +44,7 @@ pub fn main() !void {
         try brute.init_brute_force_attack(hash);
     }
     if(std.mem.eql(u8, mode.?, constants.audit_mode_string)) {
-        try audit.init_audit_mode();
+        try audit.init_audit_mode(allocator);
     }
 }
 
