@@ -13,47 +13,46 @@ pub fn init_dictionary_attack (hash: ?[]const u8, wordlist: ?[]const u8) !void {
         return;
     };
     defer file.close();
-    try dictionary_attack(hash, file);
+
+    var share_file_buffer: [4096]u8 = undefined;
+    var timer = try std.time.Timer.start();
+
+    const result = try dictionary_attack(&share_file_buffer, hash, file);
+    const elapsed_ns = timer.read();
+    try utilities.print("\n", .{});
+    if(result.found_pw == null) {
+        try utilities.print("------------------------------\n", .{});
+        try utilities.print("Congratuations!! your hashed password was NOT found in the dictionary file!!\n", .{});
+        try utilities.print("------------------------------\n", .{});
+    } else {
+        try utilities.print("------------------------------\n", .{});
+        try utilities.print("your hashed password was FOUND in the dictionary file!!\n", .{});
+        try utilities.print("found password: {s}\n", .{result.found_pw.?});
+        try utilities.print("------------------------------\n", .{});
+    }
+    try utilities.attack_summery(result.line_num, elapsed_ns); 
 }
 
-pub fn dictionary_attack(hash: ?[]const u8, wordlist_file: std.fs.File) !void {
-
-    var file_buffer: [4096]u8 = undefined;
-    var reader = wordlist_file.reader(&file_buffer);
+pub fn dictionary_attack(file_buffer: []u8, hash: ?[]const u8, wordlist_file: std.fs.File) !struct {found_pw: ?[]u8, line_num: usize} {
+    var reader = wordlist_file.reader(file_buffer);
 
     var target_hash_bytes: [16]u8 = undefined;
     _ = try std.fmt.hexToBytes(&target_hash_bytes, hash.?);
 
-    var is_equal: bool = false;
-    var found_pw: []u8 = undefined;
+    var found_pw: ?[]u8 = null;
     var line_num: usize = 0;
-
-    var timer = try std.time.Timer.start();
 
     while (try reader.interface.takeDelimiter('\n')) |line| {
         if(line_num % 1000 == 0) try utilities.print("trying the word {s}.\r", .{line});
         line_num += 1;
-        is_equal = utilities.is_md5_hash_equal(line, &target_hash_bytes);
-        if(is_equal) {
+        if(utilities.is_md5_hash_equal(line, &target_hash_bytes)) {
             found_pw = line;
             break;
         }
     }
-    
-    const elapsed_ns = timer.read();
-    
-    
-    try utilities.print("\n\n", .{});
-    if(is_equal) {
-        try utilities.print("------------------------------\n", .{});
-        try utilities.print("your hashed password was FOUND in the dictionary file!!\n", .{});
-        try utilities.print("found password: {s}\n", .{found_pw});
-        try utilities.print("------------------------------\n", .{});
-    } else {
-        try utilities.print("------------------------------\n", .{});
-        try utilities.print("Congratuations!! your hashed password was NOT found in the dictionary file!!\n", .{});
-        try utilities.print("------------------------------\n", .{});
-    }
-    try utilities.attack_summery(line_num, elapsed_ns); 
+    return .{
+        .found_pw = found_pw,
+        .line_num = line_num
+    };
 }
 
