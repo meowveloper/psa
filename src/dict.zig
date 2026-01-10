@@ -1,18 +1,25 @@
 const std = @import("std");
 const utilities = @import("utility.zig");
 
-pub fn dictionary_attack(hash: ?[]const u8, wordlist: ?[]const u8) !void {
+pub fn init_dictionary_attack (hash: ?[]const u8, wordlist: ?[]const u8) !void {
     try utilities.print("------------------------------\n", .{});
     try utilities.print("performing dictionary attack!!\n", .{});
     try utilities.print("hash: {s},\nwordlist: {s}\n", .{ hash.?, wordlist.? });
     try utilities.print("------------------------------\n\n\n", .{});
 
     const cwd = std.fs.cwd();
-    const file = try cwd.openFile(wordlist.?, .{ .mode = .read_only });
+    const file = cwd.openFile(wordlist.?, .{ .mode = .read_only }) catch {
+        try utilities.print("ERROR: cannot open the file at {s}", .{wordlist.?});
+        return;
+    };
     defer file.close();
+    try dictionary_attack(hash, file);
+}
+
+pub fn dictionary_attack(hash: ?[]const u8, wordlist_file: std.fs.File) !void {
 
     var file_buffer: [4096]u8 = undefined;
-    var reader = file.reader(&file_buffer);
+    var reader = wordlist_file.reader(&file_buffer);
 
     var target_hash_bytes: [16]u8 = undefined;
     _ = try std.fmt.hexToBytes(&target_hash_bytes, hash.?);
