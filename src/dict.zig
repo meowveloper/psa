@@ -33,16 +33,17 @@ pub fn init_dictionary_attack (hash: ?[]const u8, wordlist: ?[]const u8) !void {
     try utilities.attack_summery(result.line_num, elapsed_ns); 
 }
 
-pub fn dictionary_attack(file_buffer: []u8, hash: ?[]const u8, wordlist_file: std.fs.File) !struct {found_pw: ?[]u8, line_num: usize} {
+pub fn dictionary_attack(file_buffer: []u8, hash: ?[]const u8, wordlist_file: std.fs.File) !struct {found_pw: ?[]const u8, line_num: usize} {
     var reader = wordlist_file.reader(file_buffer);
 
     var target_hash_bytes: [16]u8 = undefined;
     _ = try std.fmt.hexToBytes(&target_hash_bytes, hash.?);
 
-    var found_pw: ?[]u8 = null;
+    var found_pw: ?[]const u8 = null;
     var line_num: usize = 0;
 
-    while (try reader.interface.takeDelimiter('\n')) |line| {
+    while (try reader.interface.takeDelimiter('\n')) |raw_line| {
+        const line = std.mem.trimRight(u8, raw_line, &std.ascii.whitespace);
         if(line_num % 1000 == 0) try utilities.print("trying the word {s}.\r", .{line});
         line_num += 1;
         if(utilities.is_md5_hash_equal(line, &target_hash_bytes)) {

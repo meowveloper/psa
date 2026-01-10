@@ -3,16 +3,16 @@ const utilities = @import("utility.zig");
 const dict = @import("dict.zig");
 
 
-var stdin_buffer: [1024]u8 = undefined;
-var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
-const stdin = &stdin_reader.interface;
-
 const Found_Pw = struct { found_pw: []u8, hash: []u8 };
 
 pub fn init_audit_mode(allocator: std.mem.Allocator) !void {
     try utilities.print("------------------------------\n", .{});
     try utilities.print("performing audit mode!!\n", .{});
     try utilities.print("------------------------------\n\n\n", .{});
+
+    var stdin_buffer: [1024]u8 = undefined;
+    var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
+    const stdin = &stdin_reader.interface;
 
     const cwd = std.fs.cwd();
     try utilities.print("type the name of the hashlist file: ", .{});
@@ -61,7 +61,8 @@ fn run_audit_mode(allocator: std.mem.Allocator, hashlist_file: std.fs.File, word
     var total_attempts: usize = 0;
 
 
-    while (try hashlist_file_reader.interface.takeDelimiter('\n')) |line| {
+    while (try hashlist_file_reader.interface.takeDelimiter('\n')) |raw_line| {
+        const line = std.mem.trimRight(u8, raw_line, &std.ascii.whitespace);
         line_num += 1;
         try utilities.print("\n========================\n", .{});
         try utilities.print("running dictionary attack on {s}.\n", .{line});
