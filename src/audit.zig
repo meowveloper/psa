@@ -45,22 +45,64 @@ pub fn init_audit_mode(allocator: std.mem.Allocator) !void {
     var timer = try std.time.Timer.start();
     const result = try run_audit_mode(allocator, hashlist_file, wordlist_file, &found_pws);
     const elapsed_ns = timer.read();
-
-    try utilities.print("\n\n****** DONE ******\n", .{});
-    try utilities.print("Total password hashes: {d}\n", .{result.total_hash});
-    try utilities.print("Number of successfully attacked password hashes: {d}\n", .{found_pws.items.len});
-    try utilities.print("Cracked Percentage: {d:.2}%\n", .{
-        (
-            @as(f64, @floatFromInt(found_pws.items.len))
-            /
-            @as(f64, @floatFromInt(result.total_hash))
-        ) * 100
-    });
-    try utilities.print("\n===Found password list===\n", .{});
-    for (found_pws.items, 0..found_pws.items.len) |item, i| {
-        try utilities.print("{d}. hash: {s}, password: {s}\n", .{i, item.hash, item.found_pw});
-    }
+    
+    try print_audit_report(found_pws.items, result.total_hash);
+    
     try utilities.attack_summery(result.total_attempts, elapsed_ns);
+}
+
+fn print_audit_report(found_pws: []Found_Pw, total_hashes: usize) !void {
+    try utilities.print("\n\n====== DETAILED AUDIT REPORT ======\n", .{});
+    
+    // 1. List Cracked Passwords
+    try utilities.print("\n[Cracked Passwords List]\n", .{});
+    var weak_len_count: usize = 0;
+    var simple_char_count: usize = 0;
+
+    for (found_pws, 0..) |item, i| {
+        try utilities.print(" {d:>3}. {s}  (hash: {s})\n", .{i + 1, item.found_pw, item.hash});
+        
+        if (item.found_pw.len < 8) weak_len_count += 1;
+        
+        var has_digit = false;
+        var has_symbol = false;
+        for (item.found_pw) |c| {
+            if (std.ascii.isDigit(c)) has_digit = true;
+            if (!std.ascii.isAlphanumeric(c)) has_symbol = true;
+        }
+        if (!has_digit and !has_symbol) simple_char_count += 1;
+    }
+
+    if (found_pws.len == 0) {
+        try utilities.print(" (No passwords were cracked)\n", .{});
+    }
+
+    // 2. Statistics
+    const cracked_count = found_pws.len;
+    const cracked_percent = if (total_hashes > 0) (@as(f64, @floatFromInt(cracked_count)) / @as(f64, @floatFromInt(total_hashes))) * 100.0 else 0.0;
+    
+    try utilities.print("\n[Vulnerability Statistics]\n", .{});
+    try utilities.print("  Total Hashes Audited:    {d}\n", .{total_hashes});
+    try utilities.print("  Total Cracked:           {d} ({d:.1}%)\n", .{cracked_count, cracked_percent});
+    try utilities.print("  - Weak Length (<8 chars):{d}\n", .{weak_len_count});
+    try utilities.print("  - Low Complexity (alpha):{d}\n", .{simple_char_count});
+
+    // 3. Score & Recommendations
+    try utilities.print("\n[Security Assessment]\n", .{});
+    if (cracked_percent >= 50.0) {
+        try utilities.print("  Status: CRITICAL VULNERABILITY\n", .{});
+        try utilities.print("  Assessment: More than half of the passwords were found in a common wordlist.\n", .{});
+        try utilities.print("  Recommendation: IMMEDIATE forced password reset required. Enforce min-length 12.\n", .{});
+    } else if (cracked_percent > 0.0) {
+        try utilities.print("  Status: WEAK\n", .{});
+        try utilities.print("  Assessment: Several passwords are weak dictionary words.\n", .{});
+        try utilities.print("  Recommendation: Enforce complexity rules (digits/symbols) and check against 'RockYou' list.\n", .{});
+    } else {
+         try utilities.print("  Status: PASS\n", .{});
+         try utilities.print("  Assessment: No passwords matched the provided dictionary.\n", .{});
+         try utilities.print("  Recommendation: Continue routine auditing. Consider testing with a larger wordlist.\n", .{});
+    }
+    try utilities.print("===================================\n", .{});
 }
 
 fn run_audit_mode(allocator: std.mem.Allocator, hashlist_file: std.fs.File, wordlist_file: std.fs.File, found_pws: *std.ArrayList(Found_Pw)) !struct { total_hash: usize, total_attempts: usize } {
