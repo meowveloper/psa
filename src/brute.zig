@@ -114,3 +114,19 @@ fn brute_recursive(buffer: *[64]u8, current_index: usize, max_length: usize, tar
     return false;
 }
 
+test "brute_recursive - finding 'abc'" {
+    var buffer: [64]u8 = undefined;
+    @memset(buffer[0..], 0);
+    var attempts: usize = 0;
+    // MD5 of "abc"
+    const target_hash = [_]u8{ 0x90, 0x01, 0x50, 0x98, 0x3c, 0xd2, 0x4f, 0xb0, 0xd6, 0x96, 0x3f, 0x7d, 0x28, 0xe1, 0x7f, 0x72 };
+    const char_set = "abcdefghijklmnopqrstuvwxyz";
+
+    const found = try brute_recursive(&buffer, 0, 3, &target_hash, char_set, &attempts);
+    
+    try std.testing.expect(found);
+    try std.testing.expectEqualStrings("abc", buffer[0..3]);
+    // It should have tried a few combinations before abc
+    try std.testing.expect(attempts > 0);
+}
+

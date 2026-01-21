@@ -57,3 +57,23 @@ pub fn dictionary_attack(file_buffer: []u8, hash: ?[]const u8, wordlist_file: st
     };
 }
 
+test "dictionary_attack - finding 'hello' in wordlist" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const file_name = "wordlist.txt";
+    try tmp.dir.writeFile(.{ .sub_path = file_name, .data = "password\n123456\nhello\nadmin\n" });
+    
+    const file = try tmp.dir.openFile(file_name, .{});
+    defer file.close();
+
+    var buffer: [1024]u8 = undefined;
+    const hello_hash_hex = "5d41402abc4b2a76b9719d911017c592"; // MD5 for "hello"
+    
+    const result = try dictionary_attack(&buffer, hello_hash_hex, file);
+    
+    try std.testing.expect(result.found_pw != null);
+    try std.testing.expectEqualStrings("hello", result.found_pw.?);
+    try std.testing.expectEqual(@as(usize, 3), result.line_num);
+}
+

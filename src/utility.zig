@@ -46,3 +46,21 @@ pub fn attack_summery (attempts: usize, elapsed_ns: u64) !void {
     try print("Total Time: {d:.4} seconds\n", .{elapsed_s});
     try print("Speed: {d:.2} hashes per second\n", .{hps});
 }
+
+test "is_md5_hash_equal - basic verification" {
+    // "hello" in MD5 is 5d41402abc4b2a76b9719d911017c592
+    const hello_hash = [_]u8{ 0x5d, 0x41, 0x40, 0x2a, 0xbc, 0x4b, 0x2a, 0x76, 0xb9, 0x71, 0x9d, 0x91, 0x10, 0x17, 0xc5, 0x92 };
+    try std.testing.expect(is_md5_hash_equal("hello", &hello_hash));
+    try std.testing.expect(!is_md5_hash_equal("world", &hello_hash));
+}
+
+test "check_mode - input validation" {
+    // These should succeed
+    try std.testing.expect(try check_mode("dict"));
+    try std.testing.expect(try check_mode("brute"));
+    try std.testing.expect(try check_mode("audit"));
+    
+    // These should fail (and print error to console during test)
+    try std.testing.expect(!(try check_mode("invalid")));
+    try std.testing.expect(!(try check_mode(null)));
+}

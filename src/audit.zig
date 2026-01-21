@@ -96,14 +96,7 @@ fn print_audit_report(found_pws: []Found_Pw, total_hashes: usize) !void {
         try utilities.print(" {d:>3}. {s}  (hash: {s})\n", .{i + 1, item.found_pw, item.hash});
         
         if (item.found_pw.len < 8) weak_len_count += 1;
-        
-        var has_digit = false;
-        var has_symbol = false;
-        for (item.found_pw) |c| {
-            if (std.ascii.isDigit(c)) has_digit = true;
-            if (!std.ascii.isAlphanumeric(c)) has_symbol = true;
-        }
-        if (!has_digit and !has_symbol) simple_char_count += 1;
+        if (is_low_complexity(item.found_pw)) simple_char_count += 1;
     }
 
     if (found_pws.len == 0) {
@@ -134,5 +127,30 @@ fn print_audit_report(found_pws: []Found_Pw, total_hashes: usize) !void {
          try utilities.print("  Recommendation: Continue routine auditing. Consider testing with a larger wordlist.\n", .{});
     }
     try utilities.print("===================================\n", .{});
+}
+
+fn is_low_complexity(password: []const u8) bool {
+    var has_digit = false;
+    var has_symbol = false;
+    for (password) |c| {
+        if (std.ascii.isDigit(c)) has_digit = true;
+        if (!std.ascii.isAlphanumeric(c)) has_symbol = true;
+    }
+    return !has_digit and !has_symbol;
+}
+
+test "is_low_complexity - categorization logic" {
+    try std.testing.expect(is_low_complexity("password"));
+    try std.testing.expect(is_low_complexity("LongerPassword"));
+    try std.testing.expect(!is_low_complexity("password123"));
+    try std.testing.expect(!is_low_complexity("pass!word"));
+    try std.testing.expect(!is_low_complexity("12345678"));
+}
+
+test "audit - weak length logic" {
+    const weak = "1234567";
+    const strong = "12345678";
+    try std.testing.expect(weak.len < 8);
+    try std.testing.expect(strong.len >= 8);
 }
 
