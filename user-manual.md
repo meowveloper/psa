@@ -9,25 +9,25 @@ This is a "Command Line" tool. It doesn't have a graphical window with buttons. 
 
 ## 1. Which file should I download?
 
-Go to the `releases` folder and download the file that matches your computer:
+Go to the `releases` folder and use the file that matches your computer:
 
 ### 🖥️ For Windows
-*   **Most Computers:** Download `psa_x86_64-windows.exe`
-*   **Surface Pro X / ARM Laptops:** Download `psa_aarch64-windows.exe`
+*   **Most Computers:** `psa_x86_64-windows.exe`
+*   **Surface Pro X / ARM Laptops:** `psa_aarch64-windows.exe`
 
 ### 🍎 For macOS
-*   **New Macs (M1, M2, M3 chips):** Download `psa_aarch64-macos`
-*   **Older Macs (Intel chips):** Download `psa_x86_64-macos`
+*   **New Macs (M1, M2, M3 chips):** `psa_aarch64-macos`
+*   **Older Macs (Intel chips):** `psa_x86_64-macos`
 
 ### 🐧 For Linux
-*   **Standard PC/Laptop:** Download `psa_x86_64-linux-musl`
-*   **Raspberry Pi / ARM:** Download `psa_aarch64-linux-musl`
+*   **Standard PC/Laptop:** `psa_x86_64-linux-musl`
+*   **Raspberry Pi / ARM:** `psa_aarch64-linux-musl`
 
 ---
 
 ## 2. How to Run on Windows
 
-1.  **Download:** Move the downloaded file (e.g., `psa_x86_64-windows.exe`) to your **Downloads** folder.
+1.  Move the file (e.g., `psa_x86_64-windows.exe`) to your folder where hashlist files and wordlist files are inside. For example Downloads folder.
 2.  **Open Command Prompt:**
     *   Press the **Windows Key** on your keyboard.
     *   Type `cmd` and press **Enter**.
@@ -47,7 +47,7 @@ Go to the `releases` folder and download the file that matches your computer:
 
 ## 3. How to Run on macOS
 
-1.  **Download:** Move the file (e.g., `psa_aarch64-macos`) to your **Downloads** folder.
+1.  **Download:** Move the file (e.g., `psa_aarch64-macos`) to your **Downloads** folder. Also move the wordlist file and hashlist files to the Downloads folder.
 2.  **Open Terminal:**
     *   Press **Command + Space**.
     *   Type `Terminal` and press **Enter**.
@@ -71,6 +71,9 @@ Go to the `releases` folder and download the file that matches your computer:
     *(Note: If you get a "Malicious Software" or "Unverified Developer" popup, go to **System Settings > Privacy & Security** and click **"Allow Anyway"** for the file. Then run the command again.)*
 
 ---
+
+## How to Run on Linux
+1. On linux, all steps are similar as MacOS, the only different is the binary file. Choose the binary file according to your hardware. 
 
 ## 4. How to Use the Modes
 
